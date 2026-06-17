@@ -1,0 +1,49 @@
+class Bin:
+    """A class representing a bin that can hold items up to a certain capacity.
+    
+    Attributes:
+        capacity (float): The maximum capacity of the bin.
+        items (list): A list of items currently in the bin.
+    """
+    def __init__(self, capacity: float):
+        self.capacity = capacity
+        self.items = []
+        
+    @property
+    def load(self):
+        """Calculate the current load of the bin."""
+        return sum(self.items)
+    
+    @property
+    def remaining(self):
+        """Calculate the remaining capacity of the bin."""
+        return self.capacity - self.load
+    
+    def can_fit(self, item: float) -> bool:
+        """Check if an item can fit in the bin without exceeding its capacity.
+        
+        Args:
+            item (float): The size of the item to check.
+        """
+        return self.load + item <= self.capacity
+    
+    def add(self, item: float):
+        """Add an item to the bin if it can fit.
+        
+        Args:
+            item (float): The size of the item to add.
+        """
+        self.items.append(item)   
+        
+    def remove(self, item: float):
+        """Remove an item from the bin.
+        
+        Args:
+            item (float): The size of the item to remove.
+        """
+        self.items.remove(item)
+        
+    def is_empty(self) -> bool:
+        """Check if the bin is empty."""
+        return len(self.items) == 0
+    
