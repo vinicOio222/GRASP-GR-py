@@ -1,7 +1,7 @@
 """Experiment runner for GRASP + Bin Packing heuristics.
 
 Usage:
-    python -m experiments.runner <instance_file> [runs] [iterations] [alpha]
+    python -m experiments.runner <instance_file_or_dir> [runs] [iterations] [alpha]
 
 Defaults: runs=3, iterations=1000, alpha=0.25
 """
@@ -48,19 +48,22 @@ HEURISTICS = [
 ]
 
 
-def run_experiment(
+def _collect_instance_paths(input_path: str) -> list[str]:
+    if os.path.isdir(input_path):
+        instance_paths = []
+        for entry in sorted(os.listdir(input_path)):
+            full_path = os.path.join(input_path, entry)
+            if os.path.isfile(full_path) and os.path.splitext(entry)[1].lower() in {".txt", ".rtf"}:
+                instance_paths.append(full_path)
+        return instance_paths
+
+    return [input_path]
+
+
+def _run_single_instance(
     instance_path: str, runs: int = 3, iterations: int = 1000,
     alpha: float = 0.25, seed: int | None = None
 ):
-    """Run all heuristics on a single instance and print a statistics table.
-
-    Args:
-        instance_path: Path to the instance file.
-        runs: Number of independent GRASP runs per heuristic.
-        iterations: GRASP iterations per run.
-        alpha: RCL alpha parameter.
-        seed: Optional random seed for reproducibility.
-    """
     if seed is not None:
         random.seed(seed)
 
@@ -102,10 +105,9 @@ def run_experiment(
         print(f"{name:<8} {stats['initial']:>7} {stats['best']:>6} {stats['worst']:>6} "
               f"{stats['average']:>7.2f} {stats['loss_pct']:>6.2f}% {stats['time']:>8.3f}s")
 
-        # Save best solution per heuristic
         best_run_solution = None
         best_run_cost = float("inf")
-        random.seed(seed)  # reset seed for reproducible best-solution extraction
+        random.seed(seed)
         for _ in range(runs):
             grasp = GRASP(alpha=alpha, iterations=iterations,
                           heuristic=heuristic, sort_order=sort_order)
@@ -130,8 +132,29 @@ def run_experiment(
     print(f"{'='*70}\n")
 
 
+def run_experiment(
+    instance_path: str, runs: int = 3, iterations: int = 1000,
+    alpha: float = 0.25, seed: int | None = None
+):
+    """Run all heuristics on one instance file or all instances in a directory.
+
+    Args:
+        instance_path: Path to an instance file or a directory of instances.
+        runs: Number of independent GRASP runs per heuristic.
+        iterations: GRASP iterations per run.
+        alpha: RCL alpha parameter.
+        seed: Optional random seed for reproducibility.
+    """
+    instance_paths = _collect_instance_paths(instance_path)
+    if not instance_paths:
+        raise FileNotFoundError(f"No instance files found in: {instance_path}")
+
+    for current_instance_path in instance_paths:
+        _run_single_instance(current_instance_path, runs=runs, iterations=iterations, alpha=alpha, seed=seed)
+
+
 if __name__ == "__main__":
-    path = sys.argv[1] if len(sys.argv) > 1 else "BP-0.txt"
+    path = sys.argv[1] if len(sys.argv) > 1 else "instances"
     runs = int(sys.argv[2]) if len(sys.argv) > 2 else 3
     iters = int(sys.argv[3]) if len(sys.argv) > 3 else 1000
     alpha = float(sys.argv[4]) if len(sys.argv) > 4 else 0.25

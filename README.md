@@ -95,18 +95,19 @@ item_n
 python main.py
 ```
 
-Runs the full experiment with all 15 heuristics on the `BP-0.txt` instance (3 runs, 1000 iterations, alpha=0.25).
+Runs the full experiment with all 15 heuristics on every instance inside `instances/` (3 runs, 1000 iterations, alpha=0.25).
 
 ### Custom execution
 
 ```bash
-python -m experiments.runner <instance_file> [runs] [iterations] [alpha]
+python -m experiments.runner <instance_file_or_dir> [runs] [iterations] [alpha]
 ```
 
 **Examples:**
 ```bash
+python -m experiments.runner instances
+python -m experiments.runner instances 5 2000 0.3
 python -m experiments.runner BP-0.txt
-python -m experiments.runner BP-0.txt 5 2000 0.3
 ```
 
 ### Expected output
@@ -126,7 +127,7 @@ FFD            5      5      5    5.00   0.00%    0.057s
 ======================================================================
 ```
 
-Individual results per heuristic are saved under `results/`.
+Individual results per heuristic are saved under `results/` for each processed instance.
 
 ---
 

@@ -7,7 +7,7 @@ RUNS = 3
 
 def main():
     run_experiment(
-        "BP-0.txt", runs=RUNS, iterations=ITERATIONS, alpha=ALPHA, seed=42
+        "instances", runs=RUNS, iterations=ITERATIONS, alpha=ALPHA, seed=42
     )
 
 if __name__ == "__main__":
