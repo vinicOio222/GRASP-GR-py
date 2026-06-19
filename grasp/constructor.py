@@ -32,17 +32,23 @@ class GRASPConstructor:
         remaining = items.copy()
         bins = []
 
-        while remaining:
-            if self.sort_order == 'D':
-                remaining.sort(reverse=True)
-            elif self.sort_order == 'I':
-                remaining.sort(reverse=False)
+        # For ordered variants, sorting once is enough because item values do not change.
+        if self.sort_order == 'D':
+            remaining.sort(reverse=True)
+        elif self.sort_order == 'I':
+            remaining.sort()
 
+        while remaining:
             rcl_size = max(1, int(len(remaining) * self.alpha))
-            rcl = remaining[:rcl_size]
-            chosen = random.choice(rcl)
+            if self.sort_order in {'D', 'I'}:
+                chosen_idx = random.randrange(rcl_size)
+                chosen = remaining.pop(chosen_idx)
+            else:
+                rcl = random.sample(remaining, rcl_size)
+                chosen = random.choice(rcl)
+                remaining.remove(chosen)
+
             self.heuristic.insert(chosen, bins, capacity)
-            remaining.remove(chosen)
 
         return bins
 
@@ -64,7 +70,7 @@ def local_search(bins: list[Bin]):
             placements = []
             success = True
 
-            for item in items_to_place:
+            for item in sorted(items_to_place, reverse=True):
                 placed = False
                 for target in other_bins:
                     if target.can_fit(item):

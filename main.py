@@ -4,10 +4,13 @@ from experiments.runner import run_experiment
 ALPHA = 0.25
 ITERATIONS = 1000
 RUNS = 3
+OPTIMUM = 50
+SEED = 42
 
 def main():
     run_experiment(
-        "instances", runs=RUNS, iterations=ITERATIONS, alpha=ALPHA, seed=42
+        instance_path="instances", runs=RUNS, iterations=ITERATIONS,
+        alpha=ALPHA, seed=SEED, optimum=OPTIMUM
     )
 
 if __name__ == "__main__":

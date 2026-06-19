@@ -2,11 +2,13 @@ def average(values: list[float]) -> float:
     return sum(values) / len(values) if values else 0.0
 
 
-def loss_percentage(obtained: float, optimum: float) -> float:
-    return ((obtained - optimum) / optimum) * 100 if optimum != 0 else 0.0
+def loss_percentage(best_found: float, optimum: float) -> float:
+    return ((best_found - optimum) / optimum) * 100 if optimum > 0 else 0.0
 
 
-def compute_stats(costs: list[int], initial_cost: int, exec_time: float) -> dict:
+def compute_stats(
+    costs: list[int], initial_cost: int, exec_time: float, optimum_cost: int | None = None
+) -> dict:
     """Compute experiment statistics from a list of solution costs across runs.
 
     Args:
@@ -15,12 +17,12 @@ def compute_stats(costs: list[int], initial_cost: int, exec_time: float) -> dict
         exec_time: Total execution time in seconds.
 
     Returns:
-        dict with keys: initial, worst, average, best, loss_pct, time.
+        dict with keys: initial, worst, average, best, loss_pct, time, optimum.
     """
     best = min(costs)
     worst = max(costs)
     avg = average(costs)
-    loss = loss_percentage(avg, best)
+    loss = loss_percentage(best, optimum_cost) if optimum_cost is not None else 0.0
     return {
         "initial": initial_cost,
         "worst": worst,
@@ -28,4 +30,5 @@ def compute_stats(costs: list[int], initial_cost: int, exec_time: float) -> dict
         "best": best,
         "loss_pct": loss,
         "time": exec_time,
+        "optimum": optimum_cost,
     }

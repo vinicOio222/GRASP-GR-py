@@ -55,12 +55,12 @@ Combining base × variant yields **15 heuristics** tested per instance: `NF, FF,
 ## Instance File Format
 
 ```
-n
-C
-item_1
-item_2
-...
-item_n
+firt line ==> n (number of items)
+second line ==> C (bin capacity)
+next n lines ==> item weights (one per line)
+Pi
+where:
+Pi = weight of item i (1 ≤ i ≤ n)
 ```
 
 **Example (`BP-0.txt`):**
@@ -100,7 +100,7 @@ Runs the full experiment with all 15 heuristics on every instance inside `instan
 ### Custom execution
 
 ```bash
-python -m experiments.runner <instance_file_or_dir> [runs] [iterations] [alpha]
+python -m experiments.runner <instance_file_or_dir> [runs] [iterations] [alpha] [heuristic] [optimum]
 ```
 
 **Examples:**
@@ -108,7 +108,12 @@ python -m experiments.runner <instance_file_or_dir> [runs] [iterations] [alpha]
 python -m experiments.runner instances
 python -m experiments.runner instances 5 2000 0.3
 python -m experiments.runner BP-0.txt
+python -m experiments.runner instances/_BP-1_n50C1000.txt 3 1000 0.25 BF
+python -m experiments.runner instances/_BP-1_n50C1000.txt 3 1000 0.25 BFD 19
 ```
+
+- `heuristic` (optional): runs only one heuristic code (`NF`, `FF`, `LF`, `BF`, `WF`, `NFD`, ...)
+- `optimum` (optional): known optimum bin count used for `% Perda = ((melhor - otimo) / otimo) * 100`
 
 ### Expected output
 
