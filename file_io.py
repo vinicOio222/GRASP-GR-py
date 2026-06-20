@@ -19,7 +19,7 @@ def read_instance(file_path: str) -> tuple[int, int, list[int]]:
 def write_solution(solution, file_path: str = "solution.txt", verbose: bool = False):
     """Write the solution to a file, including the number of bins used and the items in each bin."""
     if verbose:
-        print(f"\n Bins usados: {len(solution)}")
+        print(f"\n Bins used: {len(solution)}")
         for idx, bin_ in enumerate(solution):
             print(f" Bin {idx + 1}: {bin_.items}")
     

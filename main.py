@@ -106,6 +106,37 @@ def _collect_instance_paths(input_path: str) -> list[str]:
     return [input_path]
 
 
+def _instance_label(instance_name: str) -> str:
+    base_name = os.path.splitext(instance_name)[0].lstrip("_")
+    return base_name.split("_")[0]
+
+
+def _print_summary_table(summary_rows):
+    if not summary_rows:
+        return
+
+    print("\n" + "=" * 96)
+    print("Consolidated results by instance")
+    print("=" * 96)
+    header = (
+        f"{'No':<3} {'Instance':<10} {'n':>5} {'C':>5} {'Initial':>8} {'Worst':>6} "
+        f"{'Average':>8} {'Best':>8} {'Loss%':>8} {'Time(s)':>10}"
+    )
+    print(header)
+    print("-" * 96)
+
+    for idx, row in enumerate(summary_rows):
+        print(
+            f"{idx:<3} {row['instance']: <10} {row['n']:>5} {row['capacity']:>5} "
+            f"{row['initial']:>8} {row['worst']:>6} {row['average']:>8.2f} "
+            f"{row['best']:>8} {row['loss_pct']:>7.2f}% {row['time']:>10.3f}"
+        )
+
+    print("-" * 96)
+    print("Note: the Time(s) column represents the total time spent on the instance.")
+    print("=" * 96 + "\n")
+
+
 def _run_single_instance(
     instance_path: str, runs: int = RUNS, iterations: int = ITERATIONS,
     alpha: float = ALPHA, seed: int | None = SEED,
@@ -115,7 +146,7 @@ def _run_single_instance(
     if seed is not None:
         random.seed(seed)
 
-    _, capacity, items = read_instance(instance_path)
+    n_items, capacity, items = read_instance(instance_path)
     instance_name = os.path.basename(instance_path)
 
     # Lower bound teórico: ceil(soma dos pesos / capacidade)
@@ -131,9 +162,11 @@ def _run_single_instance(
     print("-" * 70)
 
     os.makedirs("results", exist_ok=True)
+    instance_start = time.perf_counter()
     overall_best_cost = float("inf")
     overall_best_solution = None
     overall_best_name = ""
+    overall_best_stats = None
 
     for name, heuristic, sort_order in _select_heuristics(heuristic_name):
         costs = []
@@ -170,6 +203,7 @@ def _run_single_instance(
             overall_best_cost = best_run_cost
             overall_best_solution = best_run_solution
             overall_best_name = name
+            overall_best_stats = stats
 
     print("-" * 70)
     print(f"  Overall best: {overall_best_name} with {overall_best_cost} bins")
@@ -177,6 +211,20 @@ def _run_single_instance(
     write_solution(overall_best_solution, best_out, verbose=True)
     print(f"  Best solution saved to: {best_out}")
     print(f"{'='*70}\n")
+
+    total_elapsed = time.perf_counter() - instance_start
+    return {
+        "instance": _instance_label(instance_name),
+        "n": n_items,
+        "capacity": capacity,
+        "initial": overall_best_stats["initial"],
+        "worst": overall_best_stats["worst"],
+        "average": overall_best_stats["average"],
+        "best": overall_best_stats["best"],
+        "loss_pct": overall_best_stats["loss_pct"],
+        "time": total_elapsed,
+        "heuristic": overall_best_name,
+    }
 
 
 def run_experiment(
@@ -189,15 +237,18 @@ def run_experiment(
     if not instance_paths:
         raise FileNotFoundError(f"No instance files found in: {instance_path}")
 
+    summary_rows = []
     for current_instance_path in instance_paths:
-        _run_single_instance(
+        summary_rows.append(_run_single_instance(
             current_instance_path,
             runs=runs,
             iterations=iterations,
             alpha=alpha,
             seed=seed,
             heuristic_name=heuristic_name,
-        )
+        ))
+
+    _print_summary_table(summary_rows)
 
 
 def _positive_int(value: str) -> int:

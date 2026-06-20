@@ -119,6 +119,23 @@ python main.py -i instances/_BP-7_n1000C150.txt -r 3 -n 250 -a 0.25
 
   `% Loss = ((best - LB) / LB) * 100`
 
+### Final consolidated table
+
+After processing all requested instances, the program prints a final summary table with one row per instance:
+
+- `No`
+- `Instance`
+- `n`
+- `C`
+- `Initial`
+- `Worst`
+- `Average`
+- `Best`
+- `Loss%`
+- `Time(s)`
+
+This matches the format required for the assignment report and complements the per-heuristic table printed for each instance.
+
 ### Expected output
 
 ```
@@ -134,6 +151,15 @@ FFD            5      5      5    5.00   0.00%    0.057s
 ----------------------------------------------------------------------
   Overall best: FFD with 5 bins
 ======================================================================
+
+================================================================================================
+Consolidated results by instance
+================================================================================================
+No  Instance       n     C  Initial  Worst  Average     Best   Loss%   Time(s)
+------------------------------------------------------------------------------------------------
+0   BP-0          11    10        5      5     5.00        5    0.00%      0.057
+1   BP-1          50  1000       19     19    19.00       19   11.76%      1.284
+...
 ```
 
 Individual results per heuristic are saved under `results/` for each processed instance.
