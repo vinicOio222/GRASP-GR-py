@@ -119,14 +119,6 @@ python main.py -i instances/_BP-7_n1000C150.txt -r 3 -n 250 -a 0.25
 
   `% Loss = ((best - LB) / LB) * 100`
 
-### Compatibility command
-
-`experiments/runner.py` remains available as a compatibility wrapper:
-
-```bash
-python -m experiments.runner --instance instances --runs 3 --iterations 250 --alpha 0.25
-```
-
 ### Expected output
 
 ```
