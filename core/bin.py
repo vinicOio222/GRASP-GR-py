@@ -4,6 +4,7 @@ class Bin:
     Attributes:
         capacity (float): The maximum capacity of the bin.
         items (list): A list of items currently in the bin.
+        load (float): The current total load of the bin.
     """
     def __init__(self, capacity: float):
         self.capacity = capacity
