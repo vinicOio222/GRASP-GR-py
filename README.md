@@ -55,7 +55,7 @@ Combining base × variant yields **15 heuristics** tested per instance: `NF, FF,
 ## Instance File Format
 
 ```
-firt line ==> n (number of items)
+first line ==> n (number of items)
 second line ==> C (bin capacity)
 next n lines ==> item weights (one per line)
 Pi
@@ -100,27 +100,39 @@ Runs the full experiment with all 15 heuristics on every instance inside `instan
 ### Custom execution
 
 ```bash
-python -m experiments.runner <instance_file_or_dir> [runs] [iterations] [alpha] [heuristic] [optimum]
+python main.py [--instance PATH] [--runs N] [--iterations N] [--alpha A] [--heuristic CODE]
 ```
 
 **Examples:**
 ```bash
-python -m experiments.runner instances
-python -m experiments.runner instances 5 2000 0.3
-python -m experiments.runner BP-0.txt
-python -m experiments.runner instances/_BP-1_n50C1000.txt 3 1000 0.25 BF
-python -m experiments.runner instances/_BP-1_n50C1000.txt 3 1000 0.25 BFD 19
+python main.py
+python main.py --instance instances --runs 5 --iterations 2000 --alpha 0.30
+python main.py --instance instances/_BP-0_n11C10.txt
+python main.py --instance instances/_BP-1_n50C1000.txt --runs 3 --iterations 1000 --alpha 0.25 --heuristic BF
+python main.py -i instances/_BP-7_n1000C150.txt -r 3 -n 250 -a 0.25
 ```
 
-- `heuristic` (optional): runs only one heuristic code (`NF`, `FF`, `LF`, `BF`, `WF`, `NFD`, ...)
-- `optimum` (optional): known optimum bin count used for `% Perda = ((melhor - otimo) / otimo) * 100`
+- `--heuristic` (optional): runs only one heuristic code (`NF`, `FF`, `LF`, `BF`, `WF`, `NFD`, ...)
+- `% Loss` is computed automatically from a per-instance lower bound:
+
+  `LB = ceil(sum(item_weights) / capacity)`
+
+  `% Loss = ((best - LB) / LB) * 100`
+
+### Compatibility command
+
+`experiments/runner.py` remains available as a compatibility wrapper:
+
+```bash
+python -m experiments.runner --instance instances --runs 3 --iterations 250 --alpha 0.25
+```
 
 ### Expected output
 
 ```
 ======================================================================
-  Instance : BP-0.txt
-  Items    : 11  |  Capacity: 10
+  Instance : _BP-0_n11C10.txt
+  Items    : 11  |  Capacity: 10  |  LB: 5
   Runs     : 3  |  Iterations: 1000  |  Alpha: 0.25
 ======================================================================
 Heuristic Initial   Best  Worst     Avg   Loss%   Time(s)
@@ -162,7 +174,7 @@ GRASP-GR-py/
 │   └── grasp.py             # Main GRASP loop
 │
 ├── experiments/
-│   └── runner.py            # Full runner with statistics table
+│   └── runner.py            # Compatibility wrapper that forwards to main.py
 │
 └── results/                 # Generated solutions (created automatically)
 ```
